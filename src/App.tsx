@@ -19,11 +19,7 @@ import HomeX from './Community/pages/Home';
 import ProfileX from './Community/pages/Profile';
 import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
-<<<<<<< HEAD
-import { PostOfficeSchemeExplorer } from './components/PostOfficeSection';
-=======
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
->>>>>>> 1d45dbe8b790429abb52b1e9024a55a921aeaba9
 
 
 
@@ -54,6 +50,7 @@ function App() {
                 <Route path="/postoffice" element={<PostOfficeSchemeExplorer/>}/>
             <Route path="/profilex" element={<ProfileX />} />
             <Route path="/explorex" element={<ExploreX />} />
+            <Route path="/gold" element={<GoldRatesTable rates={[]} loading={false}/>} />
             <Route path="*" element={<NotFoundX />} />
               </Routes>
             </main>
@@ -66,5 +63,6 @@ function App() {
   );
 }
 import InvestmentAnalysis from './components/FinancialAnalysis';
+import GoldRatesTable from './components/Gold';
 
 export default App;

@@ -16,6 +16,12 @@ from PIL import Image
 from langchain_groq import ChatGroq
 
 
+
+
+
+
+
+
 # Load environment variables
 load_dotenv()
 
@@ -94,7 +100,7 @@ def get_video_links():
 
     try:
         response = requests.get(BASE_URL, params=params)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response.raise_for_status()
         data = response.json()
 
         if 'error' in data:
@@ -112,7 +118,7 @@ def get_video_links():
 @app.route('/get_investment_options', methods=['POST'])
 def get_investment_options():
     data = request.json
-    logging.debug(f"Received data: {data}")  # Log incoming data
+    logging.debug(f"Received data: {data}")
 
     age = data.get("age")
     horizon = data.get("horizon")
@@ -126,7 +132,7 @@ def get_investment_options():
         return jsonify({"error": "All fields are required."}), 400
 
     recommendations = get_investment_recommendations(age, horizon, period, investment_type, amount)
-    logging.debug(f"Generated recommendations: {recommendations}")  # Log recommendations
+    logging.debug(f"Generated recommendations: {recommendations}")
 
     return jsonify({"recommended_investments": recommendations})
 
@@ -156,12 +162,10 @@ def get_investment_recommendations(age, horizon, period, investment_type, amount
 
         if age_ok and horizon_ok and period_ok and type_ok:
             recommended.append(inv["name"])
-        print(recommended)
 
     return recommended
 
-
-
+# LIC Policies Scraper
 def get_lic_policies():
     url = "https://licindia.in/insurance-plan"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -172,11 +176,9 @@ def get_lic_policies():
         
         soup = BeautifulSoup(response.text, "html.parser")
         
-        # Categories to scrape
         target_categories = {"Endowment Plans", "Money Back Plans", "Term Insurance Plans", "Pension Plans"}
         policy_categories = {}
 
-        # Find all accordion items which represent categories
         for accordion_item in soup.find_all("div", class_="accordion-item"):
             category_button = accordion_item.find("button", class_="accordion-button")
             if not category_button:
@@ -217,173 +219,38 @@ def lic_policies():
     policies = get_lic_policies()
     return jsonify(policies)
 
-app.config['UPLOAD_FOLDER'] = "uploads"
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
-# Set Tesseract OCR Path (Ensure Tesseract is installed)
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-
-# Initialize LLM Model (Replace with actual API setup)
-llm = ChatGroq(
-    temperature=0.6,
-    groq_api_key='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',
-    model_name="llama-3.3-70b-versatile"
-)
-
-# Logging Setup
-logging.basicConfig(level=logging.DEBUG)
-
-
-@app.route('/upload_file', methods=['POST'])
-def upload_file():
-    if 'file' not in request.files:
-        return jsonify({"error": "No file provided"}), 400
-
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    # Save file securely
-    filename = secure_filename(file.filename)
-    file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-    file.save(file_path)
-
-    text = ""
-
-    try:
-        # Process PDF Files
-        if filename.lower().endswith('.pdf'):
-            text = extract_text_from_pdf(file_path)
-
-        # Process Image Files
-        elif filename.lower().endswith(('.png', '.jpg', '.jpeg')):
-            text = extract_text_from_image(file_path)
-
-        else:
-            return jsonify({"error": "Unsupported file type"}), 400
-
-        # If no text extracted, return an error
-        if not text.strip():
-            return jsonify({"error": "No readable text found in the file"}), 400
-
-        # Process text with LLM
-        extracted_data = analyze_financial_document(text)
-        return jsonify({"analysis": extracted_data})
-
-    except Exception as e:
-        logging.error(f"Error processing file: {str(e)}")
-        return jsonify({"error": f"Internal Server Error: {str(e)}"}), 500
-
-
-def extract_text_from_pdf(pdf_path):
-    """Extracts text from a PDF using OCR"""
-    text = ""
-    try:
-        doc = fitz.open(pdf_path)
-        for page_num in range(min(5, len(doc))):  # Process up to 5 pages
-            page = doc.load_page(page_num)
-            pix = page.get_pixmap()
-            img = Image.open(io.BytesIO(pix.tobytes("png"))).convert('RGB')
-            text += pytesseract.image_to_string(img) + "\n"
-    except Exception as e:
-        logging.error(f"PDF Processing Error: {str(e)}")
-        raise
-    return text
-
-
-def extract_text_from_image(image_path):
-    """Extracts text from an image using OCR"""
-    try:
-        img = Image.open(image_path).convert('RGB')
-        return pytesseract.image_to_string(img)
-    except Exception as e:
-        logging.error(f"Image Processing Error: {str(e)}")
-        raise
-
-
-def analyze_financial_document(text):
-    """Analyzes financial document text using an AI model"""
-    prompt = (
-        f"Consider yourself as an experienced financial professional with expertise in investments, banking, and financial instruments.\n"
-        f"Analyze the following document text carefully:\n\n"
-        f"{text}\n\n"
-        f"### Instructions:\n"
-        f"1. **Determine the Type of Document** - Identify if it is related to investments, banking, taxation, financial agreements, etc.\n"
-        f"2. **Provide a Full Explanation** - Explain what the document is about and its significance.\n"
-        f"3. **Extract Key Details** - Identify any critical financial details present in the document.\n"
-        f"4. **Explain Calculations** - If there are any financial formulas or calculations, perform the calculations and show the results.\n"
-        f"5. **Insights** - Provide any additional insights or important warnings based on the document content.\n"
-        f"6. **Restriction** - If the document is NOT related to finance, investments, or banking, respond with: 'This document is not financial-related.'\n"
-        f"7. **Output Format:**\n"
-        f"{{\n"
-        f'"document_type": "Type of document",\n'
-        f'"explanation": "Full explanation of the document",\n'
-        f'"key_details": ["Detail 1", "Detail 2", ...],\n'
-        f'"calculations": ["Calculations based on the information present."],\n'
-        f'"insights": "Additional useful insights from the document"\n'
-        f"}}"
-    )
-
-    response = llm.invoke(prompt)
-    print(response)
-    return response.content.strip()
-
-
+# Post Office Schemes Scraper
 def get_post_office_policies():
     url = "https://www.indiapost.gov.in/Financial/pages/content/post-office-saving-schemes.aspx"
     headers = {"User-Agent": "Mozilla/5.0"}
-    response = requests.get(url, headers=headers)
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, "html.parser")
+        policies = []
 
-    if response.status_code != 200:
-        return {"error": "Failed to fetch policies"}
+        for item in soup.find_all("li", class_="li_header"):
+            title_tag = item.find("a")
+            content_tag = item.find("div", class_="li_content")
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    policies = {}
+            if title_tag and content_tag:
+                title = title_tag.text.strip()
+                content = content_tag.encode_contents().decode()
+                policies.append({"title": title, "content": content})
 
-    for item in soup.find_all("li", class_="li_header"):
-        title_tag = item.find("a")
-        content_tag = item.find("div", class_="li_content")
+        return policies
+    except requests.RequestException as e:
+        return {"error": f"Failed to fetch Post Office policies: {str(e)}"}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}"}
 
-        if title_tag and content_tag:
-            title = title_tag.text.strip()
-            description = content_tag.get_text(strip=True)  # Extract text content
-            
-            # Categorizing schemes based on keywords in title (you can improve this)
-            if "saving" in title.lower():
-                category = "Savings Schemes"
-            elif "deposit" in title.lower():
-                category = "Time Deposits"
-            elif "income" in title.lower():
-                category = "Monthly Income Schemes"
-            elif "senior" in title.lower():
-                category = "Senior Citizens Schemes"
-            elif "recurring" in title.lower():
-                category = "Recurring Deposits"
-            else:
-                category = "Other Schemes"
+@app.route("/post_office_policies")
+def post_office_policies():
+    policies = get_post_office_policies()
+    return jsonify(policies)
 
-            if category not in policies:
-                policies[category] = []
-
-            policies[category].append({
-                "title": title,
-                "description": description,
-                "interestRate": "Varies",  # Add proper interest rate if available
-                "minInvestment": "Depends on scheme",  # Placeholder
-                "tenure": "Depends on scheme",  # Placeholder
-                "link": url  # Link to the main page
-            })
-
-    return policies  # Returning categorized dictionary
-
-@app.route("/post_office_policies", methods=["GET"])
-def policies():
-    return jsonify(get_post_office_policies())
-
-
-
-
-
-# Run the app
+# Run app
 if __name__ == "__main__":
     app.run(debug=True)

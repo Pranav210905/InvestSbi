@@ -9,17 +9,21 @@ import { SchemeDetails } from './pages/SchemeDetails';
 import { SavedSchemes } from './pages/SavedSchemes';
 import { Login } from './components/Login'
 import { SignUp } from './components/SignUp'
-import { InvestmentsAdvisor } from './pages/InvestmentsAdvisor';
+import InvestmentsAdvisor from './pages/InvestmentsAdvisor';
 import { VideoGuides } from './pages/VideoGuides';
 import { Advice } from './components/Advicers';
-import Invest2 from './pages/InvestmentsAdvisor2'
+
 import { LICPolicyExplorer } from './components/LICPolicyExplorer';
 import CommunityX from './Community/CommunityX';
 import HomeX from './Community/pages/Home';
 import ProfileX from './Community/pages/Profile';
 import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
+<<<<<<< HEAD
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSection';
+=======
+import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
+>>>>>>> 1d45dbe8b790429abb52b1e9024a55a921aeaba9
 
 
 
@@ -41,8 +45,9 @@ function App() {
                 <Route path="/investments" element={<InvestmentsAdvisor/>}/>
                 <Route path="/video-guides" element={<VideoGuides />} />
                 <Route path="/advice" element={<Advice/>}/>
-                <Route path='/investments_2' element={<Invest2 />}/>
-                <Route path="/lic" element={<LICPolicyExplorer/>}/>
+                {/* <Route path='/investments_2' element={<Invest2 />}/> */}
+                <Route path="/lic-explorer" element={<LICPolicyExplorer/>}/>
+                <Route path="/post-office-explorer" element={<PostOfficeSchemeExplorer />} />
                 <Route path="/community" element={<CommunityX/>}/>
                 <Route path="/homex" element={<HomeX />} />
                 <Route path="/financial-doc-analysis" element={<InvestmentAnalysis/>}/>

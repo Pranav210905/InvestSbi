@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { Button } from "../../components/ui/button";
@@ -8,11 +7,13 @@ import { BarChart2, Image, MessageSquare, SmilePlus, Tag } from "lucide-react";
 import { users, Post } from "../../utils/mockData";
 import { toast } from "sonner";
 import { v4 as uuidv4 } from 'uuid';
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export function CreatePost() {
   const [content, setContent] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const currentUser = users[0]; // Using first mock user for demonstration
+  const { theme } = useTheme();
 
   const handleFocus = () => {
     setIsExpanded(true);
@@ -58,7 +59,7 @@ export function CreatePost() {
   };
 
   return (
-    <Card className="border-b rounded-none border-t-0 border-x-0">
+    <Card className={`border-b rounded-none border-t-0 border-x-0 ${theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'}`}>
       <div className="p-4 sm:p-6">
         <div className="flex gap-3">
           <Avatar className="h-10 w-10 md:h-12 md:w-12">
@@ -69,7 +70,7 @@ export function CreatePost() {
           <div className="flex-1">
             <Textarea
               placeholder="Share your investment insights..."
-              className="border-0 p-0 resize-none text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent"
+              className={`border-0 p-0 resize-none text-base placeholder:text-muted-foreground focus-visible:ring-0 bg-transparent ${theme === 'dark' ? 'text-white' : 'text-black'}`}
               value={content}
               onChange={handleContentChange}
               onFocus={handleFocus}

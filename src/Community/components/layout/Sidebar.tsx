@@ -1,6 +1,5 @@
-
 import { cn } from "../../lib/utils";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme } from "../../../contexts/ThemeContext";
 import { Link, useLocation } from "react-router-dom";
 import { ThemeToggle } from "../../components/ui/ThemeToggle";
 import {
@@ -39,13 +38,13 @@ export function Sidebar() {
   return (
     <div
       className={cn(
-        "h-screen sticky top-0 w-[70px] md:w-[280px] bg-sidebar flex flex-col z-10 border-r border-border",
+        "h-screen sticky top-0 w-[70px] md:w-[280px] flex flex-col z-10 border-r border-border",
         "transition-all duration-300 ease-in-out",
-        theme === "dark" ? "glass-dark" : "glass"
+        theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-black"
       )}
     >
       <div className="px-4 md:px-6 py-5 flex items-center">
-        
+        {/* Add your logo or brand name here */}
       </div>
 
       <div className="mt-6 flex flex-col flex-1 gap-2 px-2 md:px-4">
@@ -57,10 +56,10 @@ export function Sidebar() {
               to={item.href}
               className={cn(
                 "flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-100 group",
-                "hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                "hover:bg-muted/30 hover:text-foreground",
                 isActive
-                  ? "bg-sidebar-accent text-primary font-medium"
-                  : "text-sidebar-foreground"
+                  ? "bg-primary text-primary-foreground font-medium"
+                  : "text-muted-foreground"
               )}
             >
               <item.icon
@@ -68,7 +67,7 @@ export function Sidebar() {
                   "h-5 w-5 shrink-0",
                   isActive
                     ? "text-primary animate-pulse-gentle"
-                    : "text-muted-foreground group-hover:text-sidebar-accent-foreground"
+                    : "text-muted-foreground group-hover:text-foreground"
                 )}
               />
               <span className="hidden md:block">{item.name}</span>

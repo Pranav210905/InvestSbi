@@ -1,4 +1,3 @@
-
 import { Post as PostType } from "../../utils/mockData";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
 import { Card } from "../../components/ui/card";
@@ -16,6 +15,7 @@ import {
 import { cn } from "../../lib/utils";
 import { useState } from "react";
 import { Button } from "../../components/ui/button";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 interface PostProps {
   post: PostType;
@@ -27,6 +27,7 @@ export function Post({ post, isDetailed = false }: PostProps) {
   const [likeCount, setLikeCount] = useState(post.likes);
   const [isReposted, setIsReposted] = useState(post.isReposted);
   const [repostCount, setRepostCount] = useState(post.reposts);
+  const { theme } = useTheme();
 
   const handleLike = () => {
     if (isLiked) {
@@ -65,7 +66,8 @@ export function Post({ post, isDetailed = false }: PostProps) {
     <Card 
       className={cn(
         "border-b rounded-none border-t-0 border-x-0 hover:bg-muted/30 transition-colors duration-200",
-        isDetailed && "hover:bg-transparent"
+        isDetailed && "hover:bg-transparent",
+        theme === 'dark' ? 'bg-gray-800 text-white' : 'bg-white text-black'
       )}
     >
       <div className="p-4 sm:p-6">

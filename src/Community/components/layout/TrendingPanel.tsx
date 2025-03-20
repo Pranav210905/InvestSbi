@@ -1,17 +1,18 @@
-
 import { Badge } from "../../components/ui/badge";
 import { Card } from "../../components/ui/card";
 import { marketData, trendingTopics } from "../../utils/mockData";
 import { ChevronUp, ChevronDown, Hash, TrendingUp, BarChart2 } from "lucide-react";
 import { useState } from "react";
 import { cn } from "../../lib/utils";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export function TrendingPanel() {
   const [view, setView] = useState<'trends' | 'markets'>('trends');
+  const { theme } = useTheme(); // Use the useTheme hook to get the current theme
 
   return (
-    <div className="h-screen sticky top-0 w-full lg:w-[350px] hidden md:flex flex-col gap-4 pl-4 py-4 overflow-y-auto scrollbar-hide">
-      <Card className="w-full overflow-hidden bg-card/80 backdrop-blur-sm border transition-all duration-300">
+    <div className={`h-screen sticky top-0 w-full lg:w-[350px] hidden md:flex flex-col gap-4 pl-4 py-4 overflow-y-auto scrollbar-hide ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <Card className={`w-full overflow-hidden bg-card/80 backdrop-blur-sm border transition-all duration-300 ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="flex border-b">
           <button
             onClick={() => setView('trends')}
@@ -130,7 +131,7 @@ export function TrendingPanel() {
         </div>
       </Card>
 
-      <Card className="w-full overflow-hidden bg-card/80 backdrop-blur-sm border">
+      <Card className={`w-full overflow-hidden bg-card/80 backdrop-blur-sm border ${theme === 'dark' ? 'bg-gray-800' : 'bg-white'}`}>
         <div className="p-4">
           <h3 className="font-semibold mb-4">Who to follow</h3>
           

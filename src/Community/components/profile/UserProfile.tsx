@@ -1,4 +1,3 @@
-
 import { Card } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../../components/ui/avatar";
@@ -6,12 +5,15 @@ import { Badge } from "../../components/ui/badge";
 import { Calendar, LinkIcon, MapPin } from "lucide-react";
 import { User } from "../../utils/mockData";
 import { cn } from "../../lib/utils";
+import { useTheme } from "../../../contexts/ThemeContext"; // Import useTheme hook
 
 interface UserProfileProps {
   user: User;
 }
 
 export function UserProfile({ user }: UserProfileProps) {
+  const { theme } = useTheme(); // Use the useTheme hook to get the current theme
+
   const getInvestorBadge = (type: User['investorType']) => {
     switch (type) {
       case 'beginner':
@@ -30,7 +32,7 @@ export function UserProfile({ user }: UserProfileProps) {
   const badge = getInvestorBadge(user.investorType);
 
   return (
-    <div className="animate-fade-in">
+    <div className={`animate-fade-in ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}> {/* Apply conditional styling based on theme */}
       <div className="h-40 bg-gradient-to-r from-blue-500 to-cyan-400 relative">
         <div className="absolute -bottom-16 left-6">
           <Avatar className="h-32 w-32 border-4 border-background">

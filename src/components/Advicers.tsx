@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Professional, BookedMeeting } from '../types/advice';
 import ProfessionalCard from './ProfessionalCard';
 import BookedMeetings from './BookedMeetings';
+import { useTheme } from '../contexts/ThemeContext'; // Import useTheme hook
 
 export function Advice() {
   const [activeTab, setActiveTab] = useState<'professionals' | 'booked'>('professionals');
   const [bookedMeetings, setBookedMeetings] = useState<BookedMeeting[]>([]);
+  const { theme } = useTheme(); // Use the useTheme hook to get the current theme
 
   const professionals: Professional[] = [
     {
@@ -51,10 +53,10 @@ export function Advice() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <header className="bg-gray-800 shadow-sm">
+    <div className={`min-h-screen ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}> {/* Apply conditional styling based on theme */}
+      <header className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'} shadow-sm`}> {/* Apply conditional styling based on theme */}
         <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-white">Professional Connect</h1>
+          <h1 className={`text-3xl font-bold ${theme === 'dark' ? 'text-white' : 'text-black'}`}>Professional Connect</h1> {/* Apply conditional styling based on theme */}
         </div>
       </header>
 
@@ -65,7 +67,7 @@ export function Advice() {
             className={`px-4 py-2 rounded-lg font-medium ${
               activeTab === 'professionals'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : `${theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}` /* Apply conditional styling based on theme */
             }`}
           >
             Available Professionals
@@ -75,7 +77,7 @@ export function Advice() {
             className={`px-4 py-2 rounded-lg font-medium ${
               activeTab === 'booked'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                : `${theme === 'dark' ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}` /* Apply conditional styling based on theme */
             }`}
           >
             Booked Meetings

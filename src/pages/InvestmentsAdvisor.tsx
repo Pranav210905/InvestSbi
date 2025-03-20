@@ -1,170 +1,175 @@
 import { useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { Question } from '../components/Question';
-import { RecommendationCard } from '../components/RecommendationCard';
-import { QuestionnaireData, investmentOptions } from '../types/investment';
-import React from 'react';
+import { Questionnaire } from '../components/Questionnaire';
+import { Results } from '../components/Results';
+import type { Answer, InvestmentPlan } from '../types/advisor';
+import axios from 'axios';
+import { Briefcase } from 'lucide-react';
 
-export const InvestmentsAdvisor = () => {
-  const [step, setStep] = useState(0);
-  const [data, setData] = useState<QuestionnaireData>({
-    age: 0,
-    investmentFor: "myself",
-    investmentTerm: 'long-term',
-    investmentType: 'recurring',
-    amount: 0,
-    duration: 0,
-    timePeriod: 0,
-  });
+export default function InvestmentsAdvisor() {
+  const [isLoading, setIsLoading] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [investmentPlans, setInvestmentPlans] = useState<InvestmentPlan[]>([]);
+  const [error, setError] = useState<string | null>(null);
 
-  const questions = [
-    {
-      question: "What's your age?",
-      component: (
-        <input
-          type="number"
-          value={data.age || ''}
-          onChange={(e) => setData({ ...data, age: parseInt(e.target.value) })}
-          className="w-full bg-gray-700 text-white rounded-lg p-4 focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter your age"
-        />
-      ),
-      isValid: () => data.age > 0
-    },
-    {
-      question: "What's your investment horizon?",
-      component: (
-        <div className="grid grid-cols-2 gap-4">
-          {["short-term", "long-term"].map((option) => (
-            <button
-              key={option}
-              onClick={() => setData({ ...data, investmentTerm: option as any })}
-              className={`p-4 rounded-lg transition-all ${
-                data.investmentTerm === option
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              {option.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-            </button>
-          ))}
-        </div>
-      ),
-      isValid: () => Boolean(data.investmentTerm)
-    },
-    {
-      question: "How would you like to invest?",
-      component: (
-        <div className="grid grid-cols-2 gap-4">
-          {["recurring", "lumpsum"].map((option) => (
-            <button
-              key={option}
-              onClick={() => setData({ ...data, investmentType: option as any })}
-              className={`p-4 rounded-lg transition-all ${
-                data.investmentType === option
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              {option.charAt(0).toUpperCase() + option.slice(1)}
-            </button>
-          ))}
-        </div>
-      ),
-      isValid: () => Boolean(data.investmentType)
-    },
-    {
-      question: data.investmentType === 'recurring' ? "Choose your investment frequency" : "Enter your lumpsum amount",
-      component: data.investmentType === 'recurring' ? (
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            {["monthly", "fortnightly"].map((option) => (
-              <button
-                key={option}
-                onClick={() => setData({ ...data, frequency: option as any })}
-                className={`p-4 rounded-lg transition-all ${
-                  data.frequency === option
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                }`}
-              >
-                {option.charAt(0).toUpperCase() + option.slice(1)}
-              </button>
-            ))}
-          </div>
-          <input
-            type="number"
-            value={data.amount || ''}
-            onChange={(e) => setData({ ...data, amount: parseInt(e.target.value) })}
-            className="w-full bg-gray-700 text-white rounded-lg p-4 focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter amount per installment"
-          />
-        </div>
-      ) : (
-        <input
-          type="number"
-          value={data.amount || ''}
-          onChange={(e) => setData({ ...data, amount: parseInt(e.target.value) })}
-          className="w-full bg-gray-700 text-white rounded-lg p-4 focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter lumpsum amount"
-        />
-      ),
-      isValid: () => data.investmentType === 'recurring' ? (Boolean(data.frequency) && data.amount > 0) : data.amount > 0
-    },
-    {
-      question: "For how many years do you want to invest?",
-      component: (
-        <input
-          type="number"
-          value={data.duration || ''}
-          onChange={(e) => setData({ ...data, duration: parseInt(e.target.value) })}
-          className="w-full bg-gray-700 text-white rounded-lg p-4 focus:ring-2 focus:ring-blue-500"
-          placeholder="Enter number of years"
-        />
-      ),
-      isValid: () => data.duration > 0
+  const handleQuestionnaireComplete = async (answers: Answer[]) => {
+    setIsLoading(true);
+    setError(null);
+    
+    try {
+      const getAge = () => {
+        const ageStr = answers[0]?.answer?.split('-')[0];
+        const age = parseInt(ageStr);
+        if (isNaN(age)) throw new Error('Invalid age value');
+        return age;
+      };
+
+      const getHorizon = () => {
+        const horizonAnswer = answers[1]?.answer || '';
+        return horizonAnswer.toLowerCase().includes('short') ? 'short' : 'long';
+      };
+
+      const getPeriod = () => {
+        const periodStr = answers[2]?.answer?.split('-')[0];
+        const period = parseInt(periodStr);
+        if (isNaN(period)) throw new Error('Invalid period value');
+        return period;
+      };
+
+      const getInvestmentType = () => {
+        return (answers[3]?.answer || '').toLowerCase();
+      };
+
+      const getAmount = () => {
+        const amountStr = answers[4]?.answer?.replace(/[^0-9]/g, '');
+        const amount = parseInt(amountStr);
+        if (isNaN(amount)) throw new Error('Invalid amount value');
+        return amount;
+      };
+
+      const payload = {
+        age: getAge(),
+        horizon: getHorizon(),
+        period: getPeriod(),
+        investment_type: getInvestmentType(),
+        amount: getAmount()
+      };
+
+      const response = await axios.post('http://localhost:5000/get_investment_options', payload);
+      
+      if (!response.data?.recommended_investments) {
+        throw new Error('Invalid response from server');
+      }
+
+      const plans: InvestmentPlan[] = response.data.recommended_investments.map((name: string) => ({
+        name,
+        expectedReturns: getExpectedReturns(name),
+        minimumInvestment: getMinimumInvestment(name),
+        recommendedFor: getRecommendedFor(name)
+      }));
+
+      setInvestmentPlans(plans);
+      setShowResults(true);
+    } catch (error) {
+      console.error('Error fetching investment options:', error);
+      setError(error instanceof Error ? error.message : 'An unexpected error occurred');
+      setInvestmentPlans([]);
+    } finally {
+      setIsLoading(false);
     }
-  ];
+  };
+
+  const resetQuestionnaire = () => {
+    setShowResults(false);
+    setInvestmentPlans([]);
+    setError(null);
+  };
+
+  const getExpectedReturns = (name: string): string => {
+    const returns: Record<string, string> = {
+      'Real Estate Investment': '8-12% p.a.',
+      'Fixed Deposit': '5-7% p.a.',
+      'Gold Investment': '8-10% p.a.',
+      'Share Market': '12-15% p.a.',
+      'SWP Mutual Funds': '10-12% p.a.',
+      'Index Funds': '10-12% p.a.',
+      'ULIP Plans': '8-10% p.a.',
+      'Post Office Schemes': '6-7% p.a.',
+      'Startup Investment': '15-25% p.a.',
+      'Senior Citizen Savings': '7-8% p.a.',
+      'REIT': '8-10% p.a.',
+      'LIC': '5-6% p.a.'
+    };
+    return returns[name] || '8-12% p.a.';
+  };
+
+  const getMinimumInvestment = (name: string): string => {
+    const minimums: Record<string, string> = {
+      'Real Estate Investment': '₹10,00,000',
+      'Fixed Deposit': '₹1,000',
+      'Gold Investment': '₹5,000',
+      'Share Market': '₹500',
+      'SWP Mutual Funds': '₹500',
+      'Index Funds': '₹100',
+      'ULIP Plans': '₹12,000/year',
+      'Post Office Schemes': '₹1,000',
+      'Startup Investment': '₹25,000',
+      'Senior Citizen Savings': '₹1,000',
+      'REIT': '₹50,000',
+      'LIC': '₹10,000/year'
+    };
+    return minimums[name] || '₹10,000';
+  };
+
+  const getRecommendedFor = (name: string): string => {
+    const recommendations: Record<string, string> = {
+      'Real Estate Investment': 'Long-term investors with substantial capital',
+      'Fixed Deposit': 'Conservative investors seeking stable returns',
+      'Gold Investment': 'Risk-averse investors seeking value preservation',
+      'Share Market': 'Risk-tolerant investors seeking high returns',
+      'SWP Mutual Funds': 'Regular income seekers',
+      'Index Funds': 'First-time investors seeking market returns',
+      'ULIP Plans': 'Long-term investors seeking insurance + investment',
+      'Post Office Schemes': 'Conservative investors seeking government backing',
+      'Startup Investment': 'High-risk investors seeking exponential growth',
+      'Senior Citizen Savings': 'Retirees seeking stable returns',
+      'REIT': 'Real estate investors seeking liquidity',
+      'LIC': 'Risk-averse investors seeking insurance benefits'
+    };
+    return recommendations[name] || 'All investors';
+  };
 
   return (
     <div className="p-6 bg-transparent dark:bg-gray-900 text-gray-900 dark:text-white">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-4xl font-bold mb-12 text-center bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
-          Smart Investment Advisor
-        </h1>
-        
-        <AnimatePresence mode="wait">
-          {step < questions.length ? (
-            <Question
-              key={step}
-              question={questions[step].question}
-              onNext={() => setStep(step + 1)}
-              canProgress={questions[step].isValid()}
+        <div className="flex items-center justify-center mb-12">
+          <Briefcase className="text-blue-500 w-10 h-10 mr-3" />
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
+            Smart Investment Advisor
+          </h1>
+        </div>
+
+        {error && (
+          <div className="max-w-3xl mx-auto mb-6 p-5 bg-red-50 border border-red-200 rounded-lg text-lg">
+            <p className="text-red-700">{error}</p>
+            <button
+              onClick={resetQuestionnaire}
+              className="mt-3 text-red-600 hover:text-red-800 text-lg"
             >
-              {React.cloneElement(questions[step].component, {
-                className: `w-full rounded-lg p-4 focus:ring-2 focus:ring-blue-500 bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-white ${
-                  questions[step].component.props.className || ''
-                }`
-              })}
-            </Question>
-          ) : (
-            <div className="space-y-8">
-              <h2 className="text-2xl font-semibold text-center mb-8">
-                Here are your personalized investment recommendations
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {investmentOptions.map((option) => (
-                  <RecommendationCard 
-                    key={option.id} 
-                    option={option} 
-                    className="bg-white dark:bg-gray-800 shadow-lg dark:shadow-gray-700/20"
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-        </AnimatePresence>
+              Try Again
+            </button>
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="flex items-center justify-center h-[400px]">
+            <div className="animate-spin rounded-full h-14 w-14 border-b-4 border-blue-500"></div>
+          </div>
+        ) : showResults ? (
+          <Results plans={investmentPlans} onReset={resetQuestionnaire} />
+        ) : (
+          <Questionnaire onComplete={handleQuestionnaireComplete} />
+        )}
       </div>
     </div>
   );
-};
+}

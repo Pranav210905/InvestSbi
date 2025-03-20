@@ -18,3 +18,5 @@ export const ThemeToggle = () => {
     </button>
   );
 };
+
+export { useTheme };

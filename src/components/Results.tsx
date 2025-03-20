@@ -26,6 +26,7 @@ export const Results: React.FC<ResultsProps> = ({ plans, onReset }) => {
             const isLIC = plan.name.toLowerCase().includes('lic');
             const isPostOffice = plan.name.toLowerCase().includes('post office');
             const isMutualFund = plan.name.toLowerCase().includes('mutual fund');
+            const isGold = plan.name.toLowerCase().includes('gold');
 
             const PlanCard = (
               <motion.div
@@ -80,6 +81,14 @@ export const Results: React.FC<ResultsProps> = ({ plans, onReset }) => {
             if (isMutualFund) {
               return (
                 <Link to="/get-mutual-funds" key={index}>
+                  {PlanCard}
+                </Link>
+              );
+            }
+
+            if(isGold){
+              return (
+                <Link to="/gold" key={index}>
                   {PlanCard}
                 </Link>
               );

@@ -14,6 +14,11 @@ import { VideoGuides } from './pages/VideoGuides';
 import { Advice } from './components/Advicers';
 import Invest2 from './pages/InvestmentsAdvisor2'
 import { LICPolicyExplorer } from './components/LICPolicyExplorer';
+import CommunityX from './Community/CommunityX';
+import HomeX from './Community/pages/Home';
+import ProfileX from './Community/pages/Profile';
+import ExploreX from './Community/pages/Explore';
+import NotFoundX from './Community/pages/NotFound';
 
 function App() {
   return (
@@ -34,6 +39,11 @@ function App() {
                 <Route path="/advice" element={<Advice/>}/>
                 <Route path='/investments_2' element={<Invest2 />}/>
                 <Route path="/lic" element={<LICPolicyExplorer/>}/>
+                <Route path="/community" element={<CommunityX/>}/>
+                <Route path="/homex" element={<HomeX />} />
+            <Route path="/profilex" element={<ProfileX />} />
+            <Route path="/explorex" element={<ExploreX />} />
+            <Route path="*" element={<NotFoundX />} />
               </Routes>
             </main>
             <Footer />

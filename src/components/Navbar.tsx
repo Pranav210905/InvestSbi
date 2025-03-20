@@ -24,6 +24,7 @@ export const Navbar = () => {
             <Link to="/investments" className='nav-link'>Investments Advisor</Link>
             <Link to="/investments_2" className='nav-link'>Investments Advisor2</Link>
             <Link to="/video-guides" className="nav-link">Video Guides</Link>
+            <Link to='/homex'>Community</Link>
             {/* <Link to="/about" className="nav-link">About</Link> */}
             <Link to="/advice" className='nav-link'>Advice</Link>
             <ThemeToggle />

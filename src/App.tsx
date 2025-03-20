@@ -19,6 +19,7 @@ import HomeX from './Community/pages/Home';
 import ProfileX from './Community/pages/Profile';
 import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
+import { PostOfficeSchemeExplorer } from './components/PostOfficeSection';
 
 
 
@@ -45,6 +46,7 @@ function App() {
                 <Route path="/community" element={<CommunityX/>}/>
                 <Route path="/homex" element={<HomeX />} />
                 <Route path="/financial-doc-analysis" element={<InvestmentAnalysis/>}/>
+                <Route path="/postoffice" element={<PostOfficeSchemeExplorer/>}/>
             <Route path="/profilex" element={<ProfileX />} />
             <Route path="/explorex" element={<ExploreX />} />
             <Route path="*" element={<NotFoundX />} />

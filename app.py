@@ -16,12 +16,6 @@ from PIL import Image
 from langchain_groq import ChatGroq
 
 
-
-
-
-
-
-
 # Load environment variables
 load_dotenv()
 
@@ -333,6 +327,58 @@ def analyze_financial_document(text):
     response = llm.invoke(prompt)
     print(response)
     return response.content.strip()
+
+
+def get_post_office_policies():
+    url = "https://www.indiapost.gov.in/Financial/pages/content/post-office-saving-schemes.aspx"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        return {"error": "Failed to fetch policies"}
+
+    soup = BeautifulSoup(response.text, "html.parser")
+    policies = {}
+
+    for item in soup.find_all("li", class_="li_header"):
+        title_tag = item.find("a")
+        content_tag = item.find("div", class_="li_content")
+
+        if title_tag and content_tag:
+            title = title_tag.text.strip()
+            description = content_tag.get_text(strip=True)  # Extract text content
+            
+            # Categorizing schemes based on keywords in title (you can improve this)
+            if "saving" in title.lower():
+                category = "Savings Schemes"
+            elif "deposit" in title.lower():
+                category = "Time Deposits"
+            elif "income" in title.lower():
+                category = "Monthly Income Schemes"
+            elif "senior" in title.lower():
+                category = "Senior Citizens Schemes"
+            elif "recurring" in title.lower():
+                category = "Recurring Deposits"
+            else:
+                category = "Other Schemes"
+
+            if category not in policies:
+                policies[category] = []
+
+            policies[category].append({
+                "title": title,
+                "description": description,
+                "interestRate": "Varies",  # Add proper interest rate if available
+                "minInvestment": "Depends on scheme",  # Placeholder
+                "tenure": "Depends on scheme",  # Placeholder
+                "link": url  # Link to the main page
+            })
+
+    return policies  # Returning categorized dictionary
+
+@app.route("/post_office_policies", methods=["GET"])
+def policies():
+    return jsonify(get_post_office_policies())
 
 
 

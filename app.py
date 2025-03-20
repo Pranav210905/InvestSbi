@@ -26,6 +26,7 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 CORS(app)  # Allow requests from the frontend
 CORS(app, supports_credentials=True)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Initialize Gemini LLM with API Key
 def initialize_llm():
@@ -437,6 +438,47 @@ def analyze_financial_document(text):
     response = llm.invoke(prompt)
     print(response)
     return response.content.strip()
+
+URL = "https://www.bankbazaar.com/gold-rate-india.html"
+
+def scrape_gold_rates():
+    response = requests.get(URL, headers={"User-Agent": "Mozilla/5.0"})
+    soup = BeautifulSoup(response.text, 'html.parser')
+
+    # Adjust this selector based on actual structure of the website
+    table = soup.find("table")
+    if not table:
+        return []  # Fallback if table isn't found
+
+    rows = table.find("tbody").find_all("tr")
+
+    gold_rates = []
+    for row in rows:
+        cols = row.find_all("td")
+        if len(cols) < 3:
+            continue
+        city = cols[0].text.strip()
+        gold_22k = cols[1].text.strip()
+        gold_24k = cols[2].text.strip()
+
+        gold_rates.append({
+            "city": city,
+            "gold_22k": gold_22k,
+            "gold_24k": gold_24k
+        })
+
+    return gold_rates
+
+@app.route('/get_gold_rates')
+def get_gold_rates():
+    try:
+        data = scrape_gold_rates()
+        return jsonify(data)
+    except Exception as e:
+        print("Error while scraping:", e)
+        return jsonify([]), 500
+
+
 
 # Run the app
 if __name__ == "__main__":

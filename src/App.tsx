@@ -21,6 +21,7 @@ import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
 import InvestmentAnalysis from './components/FinancialAnalysis';
+import GoldRatesTable from './components/Gold';
 
 
 
@@ -52,6 +53,7 @@ function App() {
                 <Route path="/postoffice" element={<PostOfficeSchemeExplorer/>}/>
             <Route path="/profilex" element={<ProfileX />} />
             <Route path="/explorex" element={<ExploreX />} />
+            <Route path="/gold" element={<GoldRatesTable />}/>
             <Route path="*" element={<NotFoundX />} />
               </Routes>
             </main>

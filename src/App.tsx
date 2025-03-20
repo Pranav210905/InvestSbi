@@ -12,18 +12,15 @@ import { SignUp } from './components/SignUp'
 import InvestmentsAdvisor from './pages/InvestmentsAdvisor';
 import { VideoGuides } from './pages/VideoGuides';
 import { Advice } from './components/Advicers';
-
+import { MutualFundExplorer } from './components/MutualFundExplorer';
 import { LICPolicyExplorer } from './components/LICPolicyExplorer';
 import CommunityX from './Community/CommunityX';
 import HomeX from './Community/pages/Home';
 import ProfileX from './Community/pages/Profile';
 import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
-<<<<<<< HEAD
-import { PostOfficeSchemeExplorer } from './components/PostOfficeSection';
-=======
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
->>>>>>> 1d45dbe8b790429abb52b1e9024a55a921aeaba9
+import InvestmentAnalysis from './components/FinancialAnalysis';
 
 
 
@@ -48,7 +45,8 @@ function App() {
                 {/* <Route path='/investments_2' element={<Invest2 />}/> */}
                 <Route path="/lic-explorer" element={<LICPolicyExplorer/>}/>
                 <Route path="/post-office-explorer" element={<PostOfficeSchemeExplorer />} />
-                <Route path="/community" element={<CommunityX/>}/>
+                <Route path='/get-mutual-funds' element={<MutualFundExplorer/>} />
+                <Route path="/community" element={<CommunityX/>} />
                 <Route path="/homex" element={<HomeX />} />
                 <Route path="/financial-doc-analysis" element={<InvestmentAnalysis/>}/>
                 <Route path="/postoffice" element={<PostOfficeSchemeExplorer/>}/>
@@ -65,6 +63,6 @@ function App() {
     </ThemeProvider>
   );
 }
-import InvestmentAnalysis from './components/FinancialAnalysis';
+
 
 export default App;

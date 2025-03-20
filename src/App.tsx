@@ -12,7 +12,7 @@ import { SignUp } from './components/SignUp'
 import InvestmentsAdvisor from './pages/InvestmentsAdvisor';
 import { VideoGuides } from './pages/VideoGuides';
 import { Advice } from './components/Advicers';
-
+import { MutualFundExplorer } from './components/MutualFundExplorer';
 import { LICPolicyExplorer } from './components/LICPolicyExplorer';
 import CommunityX from './Community/CommunityX';
 import HomeX from './Community/pages/Home';
@@ -20,6 +20,8 @@ import ProfileX from './Community/pages/Profile';
 import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
+import InvestmentAnalysis from './components/FinancialAnalysis';
+import GoldRatesTable from './components/Gold';
 
 
 
@@ -44,13 +46,14 @@ function App() {
                 {/* <Route path='/investments_2' element={<Invest2 />}/> */}
                 <Route path="/lic-explorer" element={<LICPolicyExplorer/>}/>
                 <Route path="/post-office-explorer" element={<PostOfficeSchemeExplorer />} />
-                <Route path="/community" element={<CommunityX/>}/>
+                <Route path='/get-mutual-funds' element={<MutualFundExplorer/>} />
+                <Route path="/community" element={<CommunityX/>} />
                 <Route path="/homex" element={<HomeX />} />
                 <Route path="/financial-doc-analysis" element={<InvestmentAnalysis/>}/>
                 <Route path="/postoffice" element={<PostOfficeSchemeExplorer/>}/>
             <Route path="/profilex" element={<ProfileX />} />
             <Route path="/explorex" element={<ExploreX />} />
-            <Route path="/gold" element={<GoldRatesTable rates={[]} loading={false}/>} />
+            <Route path="/gold" element={<GoldRatesTable rates={[]} loading={false} />}/>
             <Route path="*" element={<NotFoundX />} />
               </Routes>
             </main>
@@ -62,7 +65,5 @@ function App() {
     </ThemeProvider>
   );
 }
-import InvestmentAnalysis from './components/FinancialAnalysis';
-import GoldRatesTable from './components/Gold';
 
 export default App;

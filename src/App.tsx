@@ -21,6 +21,9 @@ import ExploreX from './Community/pages/Explore';
 import NotFoundX from './Community/pages/NotFound';
 import { PostOfficeSchemeExplorer } from './components/PostOfficeSchemes';
 
+
+
+
 function App() {
   return (
     <ThemeProvider>
@@ -43,6 +46,7 @@ function App() {
                 <Route path="/post-office-explorer" element={<PostOfficeSchemeExplorer />} />
                 <Route path="/community" element={<CommunityX/>}/>
                 <Route path="/homex" element={<HomeX />} />
+                <Route path="/financial-doc-analysis" element={<InvestmentAnalysis/>}/>
             <Route path="/profilex" element={<ProfileX />} />
             <Route path="/explorex" element={<ExploreX />} />
             <Route path="*" element={<NotFoundX />} />
@@ -56,5 +60,6 @@ function App() {
     </ThemeProvider>
   );
 }
+import InvestmentAnalysis from './components/FinancialAnalysis';
 
 export default App;

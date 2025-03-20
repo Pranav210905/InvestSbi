@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Award, Briefcase, Star } from 'lucide-react';
 import { Professional } from '../types/advice';
+import { useTheme } from '../contexts/ThemeContext'; // Import useTheme hook
 
 interface ProfessionalCardProps {
   professional: Professional;
@@ -11,6 +12,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onBoo
   const [isBooking, setIsBooking] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
+  const { theme } = useTheme(); // Use the useTheme hook to get the current theme
 
   const handleBook = () => {
     if (selectedDate && selectedTime) {
@@ -31,21 +33,21 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onBoo
             className="h-16 w-16 rounded-full object-cover"
           />
           <div>
-            <h3 className="text-xl text-white font-semibold text-gray-900">{professional.name}</h3>
-            <p className="text-white">{professional.title}</p>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{professional.name}</h3>
+            <p className="text-gray-700 dark:text-white">{professional.title}</p>
           </div>
         </div>
 
         <div className="mt-4 space-y-3">
-          <div className="flex items-center text-white">
+          <div className={`flex items-center ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}>
             <Briefcase className="h-5 w-5 mr-2" />
             <span>{professional.experience}</span>
           </div>
-          <div className="flex items-center text-white">
+          <div className={`flex items-center ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}>
             <Award className="h-5 w-5 mr-2" />
             <span>{professional.expertise.join(', ')}</span>
           </div>
-          <div className="flex items-center text-white">
+          <div className={`flex items-center ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}>
             <Clock className="h-5 w-5 mr-2" />
             <span>{professional.availability[0]}</span>
           </div>
@@ -65,21 +67,21 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onBoo
         ) : (
           <div className="mt-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Date</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Date</label>
               <input
                 type="date"
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Time</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Time</label>
               <input
                 type="time"
                 value={selectedTime}
                 onChange={(e) => setSelectedTime(e.target.value)}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
               />
             </div>
             <div className="flex space-x-2">
@@ -91,7 +93,7 @@ const ProfessionalCard: React.FC<ProfessionalCardProps> = ({ professional, onBoo
               </button>
               <button
                 onClick={() => setIsBooking(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-gray-200 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-300 transition-colors dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
               >
                 Cancel
               </button>

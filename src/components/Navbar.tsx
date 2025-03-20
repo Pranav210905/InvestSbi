@@ -22,9 +22,9 @@ export const Navbar = () => {
             {/* <Link to="/profile" className="nav-link">Profile</Link> */}
             <Link to="/saved" className="nav-link">Saved Schemes</Link>
             <Link to="/investments" className='nav-link'>Investments Advisor</Link>
-            {/* <Link to="/investments_2" className='nav-link'>Investments Advisor2</Link> */}
+            {/* <Link to="/investments_2" className='nav-link'>Investments Advisor</Link> */}
             <Link to="/video-guides" className="nav-link">Video Guides</Link>
-            <Link to='/homex'>Community</Link>
+            <Link to='/homex' className='nav-link'>Community</Link>
             {/* <Link to="/about" className="nav-link">About</Link> */}
             <Link to="/advice" className='nav-link'>Advice</Link>
             <ThemeToggle />

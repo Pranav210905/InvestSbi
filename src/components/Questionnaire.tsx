@@ -1,160 +1,108 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronRight, ChevronLeft, RefreshCcw } from 'lucide-react';
-import { questions } from '../types/questions';
-import { Question, Answer } from '../types/advisor';
+import { useState } from 'react';
 
 interface QuestionnaireProps {
-  onComplete: (answers: Answer[]) => void;
+  onComplete: (answers: Answer[]) => Promise<void>;
 }
 
-export const Questionnaire: React.FC<QuestionnaireProps> = ({ onComplete }) => {
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<Answer[]>([]);
-  const [direction, setDirection] = useState(0);
+interface Answer {
+  question: string;
+  answer: string;
+}
 
-  const currentQuestion = questions[currentQuestionIndex];
+export const Questionnaire = ({ onComplete }: QuestionnaireProps) => {
+  const [step, setStep] = useState(0);
+  const [answers, setAnswers] = useState<Answer[]>([]);
+
+  const questions = [
+    {
+      question: "What's your age?",
+      type: 'number',
+      placeholder: 'Enter your age',
+    },
+    {
+      question: "What's your investment horizon?",
+      type: 'choice',
+      options: ['Short-term (1-3 years)', 'Long-term (5+ years)'],
+    },
+    {
+      question: "For how many years do you want to invest?",
+      type: 'number',
+      placeholder: 'Enter number of years',
+    },
+    {
+      question: "How would you like to invest?",
+      type: 'choice',
+      options: ['Recurring', 'Lumpsum'],
+    },
+    {
+      question: "What's your investment amount?",
+      type: 'number',
+      placeholder: 'Enter amount in ₹',
+    },
+  ];
+
+  const handleNext = () => {
+    if (step < questions.length - 1) {
+      setStep(step + 1);
+    } else {
+      onComplete(answers);
+    }
+  };
 
   const handleAnswer = (answer: string) => {
-    const newAnswers = [...answers];
-    newAnswers[currentQuestionIndex] = {
-      questionId: currentQuestion.id,
-      answer
-    };
-    setAnswers(newAnswers);
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setDirection(1);
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-    } else {
-      onComplete(newAnswers);
-    }
+    const updatedAnswers = [...answers];
+    updatedAnswers[step] = { question: questions[step].question, answer };
+    setAnswers(updatedAnswers);
   };
 
-  const goToPrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setDirection(-1);
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    }
-  };
-
-  const restart = () => {
-    setAnswers([]);
-    setDirection(-1);
-    setCurrentQuestionIndex(0);
-  };
-
-  const variants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0
-    })
-  };
+  const currentQuestion = questions[step];
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-6">
-      <div className="relative h-[400px]">
-        <AnimatePresence mode="wait" custom={direction}>
-          <motion.div
-            key={currentQuestionIndex}
-            custom={direction}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }}
-            className="absolute w-full"
-          >
-            <div className="bg-white rounded-xl shadow-lg p-8">
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="text-sm font-medium text-gray-500">
-                    Question {currentQuestionIndex + 1} of {questions.length}
-                  </span>
-                  <button
-                    onClick={restart}
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <RefreshCcw size={20} />
-                  </button>
-                </div>
-                <h2 className="text-2xl font-semibold text-gray-800">
-                  {currentQuestion.text}
-                </h2>
-              </div>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-semibold text-center mb-8">
+        {currentQuestion.question}
+      </h2>
 
-              <div className="space-y-3">
-                {currentQuestion.options.map((option, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleAnswer(option)}
-                    className={`w-full p-4 text-left rounded-lg transition-all ${
-                      answers[currentQuestionIndex]?.answer === option
-                        ? 'bg-blue-500 text-white'
-                        : 'bg-gray-50 hover:bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {option}
-                  </button>
-                ))}
-              </div>
+      <div className="w-full max-w-md mx-auto">
+        {currentQuestion.type === 'number' ? (
+          <input
+            type="number"
+            value={answers[step]?.answer || ''}
+            onChange={(e) => handleAnswer(e.target.value)}
+            className="w-full bg-gray-700 text-white rounded-lg p-4 focus:ring-2 focus:ring-blue-500"
+            placeholder={currentQuestion.placeholder}
+          />
+        ) : (
+          <div className="grid grid-cols-2 gap-4">
+            {currentQuestion.options?.map((option) => (
+              <button
+                key={option}
+                onClick={() => handleAnswer(option)}
+                className={`p-4 rounded-lg transition-all ${
+                  answers[step]?.answer === option
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                }`}
+              >
+                {option}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
-              <div className="mt-8 flex justify-between">
-                <button
-                  onClick={goToPrevious}
-                  disabled={currentQuestionIndex === 0}
-                  className={`flex items-center ${
-                    currentQuestionIndex === 0
-                      ? 'text-gray-300'
-                      : 'text-gray-600 hover:text-gray-800'
-                  }`}
-                >
-                  <ChevronLeft size={20} />
-                  Previous
-                </button>
-                <div className="flex space-x-2">
-                  {questions.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-2 h-2 rounded-full ${
-                        index === currentQuestionIndex
-                          ? 'bg-blue-500'
-                          : 'bg-gray-200'
-                      }`}
-                    />
-                  ))}
-                </div>
-                {currentQuestionIndex < questions.length - 1 && (
-                  <button
-                    onClick={() => handleAnswer(answers[currentQuestionIndex]?.answer || '')}
-                    disabled={!answers[currentQuestionIndex]}
-                    className={`flex items-center ${
-                      !answers[currentQuestionIndex]
-                        ? 'text-gray-300'
-                        : 'text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    Next
-                    <ChevronRight size={20} />
-                  </button>
-                )}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
+      <div className="flex justify-center">
+        <button
+          onClick={handleNext}
+          disabled={!answers[step]?.answer}
+          className={`px-8 py-3 rounded-lg text-lg font-semibold transition-all ${
+            answers[step]?.answer
+              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-gray-600 text-gray-400 cursor-not-allowed'
+          }`}
+        >
+          {step < questions.length - 1 ? 'Next' : 'Finish'}
+        </button>
       </div>
     </div>
   );

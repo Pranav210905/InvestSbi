@@ -9,13 +9,6 @@ from langchain.chains import LLMChain
 from dotenv import load_dotenv
 from bs4 import BeautifulSoup
 
-
-
-
-
-
-
-
 # Load environment variables
 load_dotenv()
 
@@ -93,7 +86,7 @@ def get_video_links():
 
     try:
         response = requests.get(BASE_URL, params=params)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+        response.raise_for_status()
         data = response.json()
 
         if 'error' in data:
@@ -111,7 +104,7 @@ def get_video_links():
 @app.route('/get_investment_options', methods=['POST'])
 def get_investment_options():
     data = request.json
-    logging.debug(f"Received data: {data}")  # Log incoming data
+    logging.debug(f"Received data: {data}")
 
     age = data.get("age")
     horizon = data.get("horizon")
@@ -125,7 +118,7 @@ def get_investment_options():
         return jsonify({"error": "All fields are required."}), 400
 
     recommendations = get_investment_recommendations(age, horizon, period, investment_type, amount)
-    logging.debug(f"Generated recommendations: {recommendations}")  # Log recommendations
+    logging.debug(f"Generated recommendations: {recommendations}")
 
     return jsonify({"recommended_investments": recommendations})
 
@@ -155,12 +148,10 @@ def get_investment_recommendations(age, horizon, period, investment_type, amount
 
         if age_ok and horizon_ok and period_ok and type_ok:
             recommended.append(inv["name"])
-        print(recommended)
 
     return recommended
 
-
-
+# LIC Policies Scraper
 def get_lic_policies():
     url = "https://licindia.in/insurance-plan"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -171,11 +162,9 @@ def get_lic_policies():
         
         soup = BeautifulSoup(response.text, "html.parser")
         
-        # Categories to scrape
         target_categories = {"Endowment Plans", "Money Back Plans", "Term Insurance Plans", "Pension Plans"}
         policy_categories = {}
 
-        # Find all accordion items which represent categories
         for accordion_item in soup.find_all("div", class_="accordion-item"):
             category_button = accordion_item.find("button", class_="accordion-button")
             if not category_button:
@@ -216,9 +205,38 @@ def lic_policies():
     policies = get_lic_policies()
     return jsonify(policies)
 
+# Post Office Schemes Scraper
+def get_post_office_policies():
+    url = "https://www.indiapost.gov.in/Financial/pages/content/post-office-saving-schemes.aspx"
+    headers = {"User-Agent": "Mozilla/5.0"}
+    
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.text, "html.parser")
+        policies = []
 
+        for item in soup.find_all("li", class_="li_header"):
+            title_tag = item.find("a")
+            content_tag = item.find("div", class_="li_content")
 
+            if title_tag and content_tag:
+                title = title_tag.text.strip()
+                content = content_tag.encode_contents().decode()
+                policies.append({"title": title, "content": content})
 
-# Run the app
+        return policies
+    except requests.RequestException as e:
+        return {"error": f"Failed to fetch Post Office policies: {str(e)}"}
+    except Exception as e:
+        return {"error": f"An unexpected error occurred: {str(e)}"}
+
+@app.route("/post_office_policies")
+def post_office_policies():
+    policies = get_post_office_policies()
+    return jsonify(policies)
+
+# Run app
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,4 +1,3 @@
-
 import { Post as PostComponent } from "./Post";
 import { CreatePost } from "./CreatePost";
 import { posts as mockPosts, investmentCategories } from "../../utils/mockData";
@@ -6,10 +5,12 @@ import { Button } from "../../components/ui/button";
 import { useState, useEffect } from "react";
 import { cn } from "../../lib/utils";
 import { Post } from "../../utils/mockData";
+import { useTheme } from "../../../contexts/ThemeContext";
 
 export function Feed() {
   const [activeFilter, setActiveFilter] = useState<string>("For you");
   const [allPosts, setAllPosts] = useState<Post[]>([]);
+  const { theme } = useTheme();
   
   // Function to load posts from localStorage and merge with mock posts
   const loadPosts = () => {
@@ -38,8 +39,8 @@ export function Feed() {
   }, []);
 
   return (
-    <div className="border-b animate-fade-in">
-      <div className="border-b sticky top-0 bg-background/80 backdrop-blur-md z-10">
+    <div className={`border-b animate-fade-in ${theme === 'dark' ? 'bg-gray-900 text-white' : 'bg-white text-black'}`}>
+      <div className={`border-b sticky top-0 ${theme === 'dark' ? 'bg-gray-800' : 'bg-background/80'} backdrop-blur-md z-10`}>
         <h1 className="text-xl font-bold p-4 sm:p-6">Home</h1>
         
         <div className="flex border-b">

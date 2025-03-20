@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React from 'react';
-=======
 import React, { useEffect, useState } from 'react';
->>>>>>> 902be5bc4a2820faf92409be4f71aa8c2c81e39e
 import { useTheme } from '../contexts/ThemeContext';
 
 interface GoldRate {
@@ -11,15 +7,6 @@ interface GoldRate {
   gold_24k: string;
 }
 
-<<<<<<< HEAD
-interface Props {
-  rates: GoldRate[];
-  loading: boolean;
-}
-
-export const GoldRatesTable: React.FC<Props> = ({ rates, loading }) => {
-  const { theme } = useTheme();
-=======
 export const GoldRatesTable: React.FC = () => {
   const { theme } = useTheme();
   const [rates, setRates] = useState<GoldRate[]>([]);
@@ -41,7 +28,6 @@ export const GoldRatesTable: React.FC = () => {
 
     fetchGoldRates();
   }, []);
->>>>>>> 902be5bc4a2820faf92409be4f71aa8c2c81e39e
 
   return (
     <div className={`overflow-x-auto ${theme === 'dark' ? 'text-white' : 'text-gray-800'}`}>
@@ -64,11 +50,7 @@ export const GoldRatesTable: React.FC = () => {
             </tr>
           ) : (
             rates.map((rate, index) => (
-<<<<<<< HEAD
-              <tr 
-=======
               <tr
->>>>>>> 902be5bc4a2820faf92409be4f71aa8c2c81e39e
                 key={rate.city}
                 className={`
                   ${theme === 'dark' ? 'hover:bg-gray-800' : 'hover:bg-gray-50'}
@@ -87,8 +69,4 @@ export const GoldRatesTable: React.FC = () => {
   );
 };
 
-<<<<<<< HEAD
 export default GoldRatesTable;
-=======
-export default GoldRatesTable;
->>>>>>> 902be5bc4a2820faf92409be4f71aa8c2c81e39e

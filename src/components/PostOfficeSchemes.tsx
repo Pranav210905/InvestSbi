@@ -31,6 +31,7 @@ export function PostOfficeSchemeExplorer() {
     try {
       const response = await fetch('http://localhost:5000/post_office_policies');
       const data = await response.json();
+      console.log(data);
       setSchemes(data);
       setLoading(false);
     } catch (err) {

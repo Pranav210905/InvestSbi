@@ -25,12 +25,12 @@ logging.basicConfig(level=logging.DEBUG)
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Allow requests from the frontend
-CORS(app, supports_credentials=True)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5174"])
+
 
 # Initialize Gemini LLM with API Key
 def initialize_llm():
-    gemini_api_key = os.getenv("GEMINI_API_KEY")  # Use environment variable for security
+    gemini_api_key = "AIzaSyAEzctJ3QK61LAUjmIoTEvDuTV9FFKt-vc"  # Use environment variable for security
     model_name = "gemini-1.5-pro-latest"
     llm = ChatGoogleGenerativeAI(api_key=gemini_api_key, model=model_name)
     return llm
@@ -240,11 +240,12 @@ def get_lic_policies():
         return {"error": f"An unexpected error occurred: {str(e)}"}
 
 # Route to get Post Office policies
-@app.route("/post_office_policies", methods=["GET"])
-def post_office_policies():
-    return jsonify(get_post_office_policies())
+#@app.route("/post_office_policies", methods=["GET"])
+#def post_office_policies():
+   # return jsonify(get_post_office_policies())
 
 # Helper function to get Post Office policies
+@app.route("/post_office_policies", methods=["GET"])
 def get_post_office_policies():
     url = "https://www.indiapost.gov.in/Financial/pages/content/post-office-saving-schemes.aspx"
     headers = {"User-Agent": "Mozilla/5.0"}
@@ -343,6 +344,20 @@ def get_gold_prices():
         return {"error": f"Failed to fetch gold prices: {str(e)}"}
     except Exception as e:
         return {"error": f"An unexpected error occurred: {str(e)}"}
+    
+
+
+app.config['UPLOAD_FOLDER'] = "uploads"
+
+# Ensure upload folder exists
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
+# Initialize LLM Model (Replace with actual API setup)
+llm = ChatGroq(
+    temperature=0.6,
+    groq_api_key='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',
+    model_name="llama-3.3-70b-versatile"
+)
 
 # Route for file upload and analysis
 @app.route('/upload_file', methods=['POST'])

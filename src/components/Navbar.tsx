@@ -22,6 +22,7 @@ export const Navbar = () => {
             {/* <Link to="/profile" className="nav-link">Profile</Link> */}
             <Link to="/saved" className="nav-link">Saved Schemes</Link>
             <Link to="/investments" className='nav-link'>Investments Advisor</Link>
+            <Link to="/financial-doc-analysis" className='nav-link'>Financial Doc Analyzer</Link>
             {/* <Link to="/investments_2" className='nav-link'>Investments Advisor</Link> */}
             <Link to="/video-guides" className="nav-link">Video Guides</Link>
             <Link to='/homex' className='nav-link'>Community</Link>

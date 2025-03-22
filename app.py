@@ -25,7 +25,7 @@ logging.basicConfig(level=logging.DEBUG)
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Allow requests from the frontend
-CORS(app, supports_credentials=True, origins=["http://127.0.0.1:5174"])
+CORS(app, supports_credentials=True)
 
 
 # Initialize Gemini LLM with API Key
@@ -345,7 +345,7 @@ def get_gold_prices():
     except Exception as e:
         return {"error": f"An unexpected error occurred: {str(e)}"}
     
-
+pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
 app.config['UPLOAD_FOLDER'] = "uploads"
 
